@@ -10,7 +10,12 @@ async function mainPrompt() {
   const desciption = await inputDescription();
   const argv = [...process.argv.slice(2)].join(" ");
 
-  exec(`git commit -m "${activity}: ${branchName} ${desciption}" ${argv}`);
+  exec(
+    `git commit -m "${activity}: ${branchName} ${desciption}" ${argv}`,
+    (_, stdout) => {
+      console.log(stdout);
+    }
+  );
 }
 
 async function selectActivity() {
@@ -43,7 +48,7 @@ async function selectActivity() {
 
 async function inputBranchName() {
   return new Promise(function (resolve, reject) {
-    exec("git branch --show-current", async (err, stdout, stderr) => {
+    exec("git branch --show-current", async (err, stdout) => {
       if (err) {
         reject();
       }
