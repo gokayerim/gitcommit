@@ -1,0 +1,37 @@
+{
+  "name": "semantic-git-commit",
+  "version": "0.0.8",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gokayerim/gitcommit"
+  },
+  "scripts": {
+    "start": "node ./src/index.js",
+    "dev": "nodemon ./src/index.js",
+    "build": "rollup ./src/index.js -c",
+    "deploy": "yarn build && yarn publish"
+  },
+  "bin": {
+    "commitz": "./dist/index.js"
+  },
+  "author": {
+    "email": "gokayerim@gmail.com",
+    "name": "Gökay Erim"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@inquirer/select": "1.2.5",
+    "chalk": "^5.3.0",
+    "inquirer": "9.2.8",
+    "figlet": "^1.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "rollup": "^3.26.3",
+    "rollup-plugin-uglify": "^6.0.4",
+    "rollup-plugin-add-shebang": "^0.3.1"
+  }
+}

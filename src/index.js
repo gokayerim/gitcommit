@@ -8,23 +8,36 @@ async function mainPrompt() {
   const activity = await selectActivity();
   const branchName = await inputBranchName();
   const desciption = await inputDescription();
+  const argv = [...process.argv.slice(2)].join(" ");
 
-  console.log(`${activity}: ${branchName} ${desciption}`);
-
-  exec(`git commit -m "${activity}: ${branchName} ${desciption}"`);
+  exec(`git commit -m "${activity}: ${branchName} ${desciption}" ${argv}`);
 }
 
 async function selectActivity() {
-  const types = ["feat", "refactor", "chore"];
+  const types = [
+    { key: "feat", description: "A new feature" },
+    { key: "fix", description: "A bug fix" },
+    {
+      key: "chore",
+      description: "Updating grunt tasks etc; no production code change"
+    },
+    { key: "test", description: "Adding missing tests" },
+    { key: "refactor", description: "Improve readability of the code" },
+    { key: "docs", description: "Only documantation changes" },
+    {
+      key: "docs",
+      description:
+        "Formatting, missing semi colons, etc; no production code change"
+    }
+  ];
 
   const selectedActivity = await select({
-    message: "Aktivite seçiniz: ",
+    message: "Select job type: ",
     choices: types.map((t) => ({
-      name: t,
-      value: t
+      value: t.key,
+      name: `${t.key.padEnd(15, " ")}: ${t.description}`
     }))
   });
-
   return selectedActivity;
 }
 
@@ -34,14 +47,13 @@ async function inputBranchName() {
       if (err) {
         reject();
       }
-
-      const def = /(^[A-Z]{1,10}\-\d{3,5})/.exec(stdout)[0];
+      const def = /(^[A-Z]{1,10}\-\d{3,5})/.exec(stdout);
 
       const { branchName } = await inquirer.prompt({
         type: "input",
         name: "branchName",
-        default: def,
-        message: "Branch name giriniz: "
+        default: def?.length && def[0],
+        message: "Enter job number: "
       });
 
       resolve(branchName);
@@ -52,10 +64,18 @@ async function inputDescription() {
   const { desciption } = await inquirer.prompt({
     type: "input",
     name: "desciption",
-    message: "Açıklama  giriniz: "
+    message: "Enter description: ",
+    validate: async (input) => input.length > 2
   });
 
   return desciption;
 }
 
-mainPrompt();
+exec("git branch", (err) => {
+  if (err) {
+    console.log("You are not in a git project !!!");
+    process.exit(0);
+  } else {
+    mainPrompt();
+  }
+});
