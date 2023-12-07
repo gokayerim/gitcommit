@@ -6,7 +6,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gokayerim/gitcommit"
+    "url": "https://github.com/gokayerim/semantic-git-commits"
   },
   "scripts": {
     "start": "node ./src/index.js",
