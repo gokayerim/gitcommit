@@ -27,11 +27,12 @@ alias MY_AWESEOME_COMMIT_COMMAND=commitz;
 ## Structure
 This command accept three different field from you.
 
-### Chnage Type:
+### Change Type:
 You need to select one of predefined types like feat, fix, test, refactor etc...
 
 ### Task Id
 If your branch name created with task id, the program detect and suggest it automaticly. But if you want you can write another task id or you can leave it blank. Predefined Task Id works with this regex. `/(^[A-Z]{1,10}\-\d{1,6})/`.
+
 Sample branch name samples
 - `ABC-1234`
 - `AB-11-make-something`
