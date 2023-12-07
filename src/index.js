@@ -2,12 +2,14 @@
 
 import inquirer from "inquirer";
 import select from "@inquirer/select";
+import chalk from "chalk";
 import { exec } from "child_process";
+import { COMMIT_TYPES, JIRA_ID_REGEX } from "./constants.js";
 
 async function mainPrompt() {
-  const activity = await selectActivity();
-  const branchName = await inputBranchName();
-  const desciption = await inputDescription();
+  const activity = await selectCommitType();
+  const branchName = await inputTaskId();
+  const desciption = await inputCommitMessage();
   const argv = [...process.argv.slice(2)].join(" ");
 
   exec(
@@ -18,27 +20,11 @@ async function mainPrompt() {
   );
 }
 
-async function selectActivity() {
-  const types = [
-    { key: "feat", description: "A new feature" },
-    { key: "fix", description: "A bug fix" },
-    {
-      key: "chore",
-      description: "Updating grunt tasks etc; no production code change"
-    },
-    { key: "test", description: "Adding missing tests" },
-    { key: "refactor", description: "Improve readability of the code" },
-    { key: "docs", description: "Only documantation changes" },
-    {
-      key: "docs",
-      description:
-        "Formatting, missing semi colons, etc; no production code change"
-    }
-  ];
+async function selectCommitType() {
 
   const selectedActivity = await select({
-    message: "Select job type: ",
-    choices: types.map((t) => ({
+    message: "Select Change Type: ",
+    choices: COMMIT_TYPES.map((t) => ({
       value: t.key,
       name: `${t.key.padEnd(15, " ")}: ${t.description}`
     }))
@@ -46,41 +32,47 @@ async function selectActivity() {
   return selectedActivity;
 }
 
-async function inputBranchName() {
+async function inputTaskId() {
   return new Promise(function (resolve, reject) {
     exec("git branch --show-current", async (err, stdout) => {
       if (err) {
         reject();
       }
-      const def = /(^[A-Z]{1,10}\-\d{3,5})/.exec(stdout);
+      const jobId = JIRA_ID_REGEX.exec(stdout);
 
-      const { branchName } = await inquirer.prompt({
+      const { taskId } = await inquirer.prompt({
         type: "input",
-        name: "branchName",
-        default: def?.length && def[0],
-        message: "Enter job number: "
+        name: "taskId",
+        default: jobId?.length && jobId[0],
+        message: "Enter Task Id: "
       });
 
-      resolve(branchName);
+      resolve(taskId);
     });
   });
 }
-async function inputDescription() {
-  const { desciption } = await inquirer.prompt({
+async function inputCommitMessage() {
+  const { message } = await inquirer.prompt({
     type: "input",
-    name: "desciption",
-    message: "Enter description: ",
+    name: "message",
+    message: "Enter Commit Message: ",
     validate: async (input) => input.length > 2
   });
 
-  return desciption;
+  return message;
 }
 
 exec("git branch", (err) => {
   if (err) {
-    console.log("You are not in a git project !!!");
+    console.log(chalk.red("You are not in a git project! 🤦"));
     process.exit(0);
-  } else {
-    mainPrompt();
   }
+  exec("git diff --name-only --cached", (err, result) => {
+    if (!result) {
+      console.log(chalk.red("Stage is empty. Nothing to commit! 🤷"))
+      process.exit(0);
+    }
+
+    mainPrompt();
+  })
 });
