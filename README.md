@@ -5,7 +5,7 @@ With this project, you can use your commit messages according to semantic standa
 ## Installation
 
 ```
-npm install --globall semantic-git-commit
+npm install --global semantic-git-commit
 ```
 or
 ```

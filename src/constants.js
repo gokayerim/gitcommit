@@ -17,4 +17,4 @@ export const COMMIT_TYPES = [
 ];
 
 
-export const JIRA_ID_REGEX = /(^[A-Z]{1,10}\-\d{1,6})/
+export const JIRA_ID_REGEX = /([A-Z]{1,10}\-\d{1,6})/
